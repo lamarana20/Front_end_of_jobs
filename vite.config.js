@@ -12,19 +12,7 @@ export default defineConfig({
     vueDevTools(),
     
   ],
-  server: {
-    proxy:{
-      '/api': {
-        target: 'https://back-end-jobs-api-main-3cw2mc.laravel.cloud',
-
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, '')
-      },
-    },
-
-   
-   
-  },
+ 
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))

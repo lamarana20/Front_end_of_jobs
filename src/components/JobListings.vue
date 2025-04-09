@@ -28,7 +28,7 @@ const state = reactive({
 
 const fetchJobs = async () => {
   try {
-    const response = await axios.get('/api/api/jobs')
+    const response = await axios.get('https://back-end-jobs-api-main-3cw2mc.laravel.cloud/api/jobs')
     state.allJobs = response.data
     applyFilter()  
   } catch (error) {
