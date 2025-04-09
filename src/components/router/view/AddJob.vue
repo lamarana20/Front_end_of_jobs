@@ -21,7 +21,7 @@ const router = useRouter()
 
 const submitForm = async () => {
   try {
-    const response = await axios.post('/api/api/jobs', form)
+    const response = await axios.post('https://back-end-jobs-api-main-3cw2mc.laravel.cloud/api/jobs', form)
     toast.success('Job added successfully!')
     router.push('/jobs')
 

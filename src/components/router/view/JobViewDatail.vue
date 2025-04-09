@@ -36,7 +36,7 @@ const deleteJob = async (jobId) => {
 
 onMounted(async () => {
   try {
-    const response = await axios.get(`/api/api/jobs/${jobId}`)
+    const response = await axios.get(`https://back-end-jobs-api-main-3cw2mc.laravel.cloud/api/jobs/${jobId}`)
     if (response.data) {
       state.job = response.data
     } else {
