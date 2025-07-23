@@ -1,5 +1,7 @@
 <script setup>
-import { defineProps } from 'vue';
+import { defineProps, onMounted } from 'vue';
+import { useToast } from 'vue-toastification';
+const toast = useToast();
 defineProps({
   title: {
     type: String,
@@ -9,6 +11,20 @@ defineProps({
         type: String,
         default: 'Find the Vue job that fits your skills and needs',
     },
+});
+onMounted(() => {
+const timer = setTimeout(() => {
+  toast.success('Welcome to Vue Jobs! Explore the latest job listings and find your dream job today!',{
+    position: 'top-right',
+    timeout: 5000,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+  });
+  clearTimeout(timer);
+
+}, 1000);
+
 });
 
 </script>

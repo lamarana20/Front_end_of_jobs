@@ -28,7 +28,7 @@ const router = useRouter()
 
 const submitForm = async () => {
   try {
-    const response = await axios.put(`https://back-end-jobs-api-main-3cw2mc.laravel.cloud/api/jobs/${jobId}`, form)
+    const response = await axios.put(`https://backend-jobs-main-d8y5e0.laravel.cloud/api/jobs/${jobId}`, form)
 
     toast.success('Job update successfully!')
     router.push('/jobs')
@@ -42,7 +42,7 @@ const submitForm = async () => {
 };
 onMounted(async () => {
   try {
-    const response = await axios.get(`https://back-end-jobs-api-main-3cw2mc.laravel.cloud/api/jobs/${jobId}`)
+    const response = await axios.get(`https://backend-jobs-main-d8y5e0.laravel.cloud/api/jobs/${jobId}`)
    state.job =response.data;
    //populate inputs
    form.title = state.job.title;

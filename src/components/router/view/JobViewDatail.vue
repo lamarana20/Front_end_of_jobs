@@ -5,10 +5,9 @@ import axios from 'axios'
 import { useToast } from 'vue-toastification'
 import BackButton from '@/components/BackButton.vue'
 
-// Initialisation du routeur et de la route actuelle
 const route = useRoute()
 const router = useRouter()
-
+const toast = useToast()
 const jobId = route.params.id
 
 const state = reactive({
@@ -17,31 +16,25 @@ const state = reactive({
   error: false
 })
 
-// Fonction pour supprimer l'offre d'emploi
 const deleteJob = async (jobId) => {
-  const confirmDelete = confirm('Are you sure you want to delete this job?')
-  if (!confirmDelete) {
-    return
-  }
-  const toast = useToast()
+  const confirmDelete = confirm('Êtes-vous sûr de vouloir supprimer cette offre ?')
+  if (!confirmDelete) return
+  
   try {
     await axios.delete(`/api/api/jobs/${jobId}`)
-    toast.success('Job deleted successfully!')
-    router.push('/jobs') // Redirection correcte
+    toast.success('Offre supprimée avec succès !')
+    router.push('/jobs')
   } catch (error) {
     console.error('Error deleting job:', error)
-    toast.error('Failed to delete job. Please try again.')
+    toast.error('Échec de la suppression. Veuillez réessayer.')
   }
 }
 
 onMounted(async () => {
   try {
-    const response = await axios.get(`https://back-end-jobs-api-main-3cw2mc.laravel.cloud/api/jobs/${jobId}`)
-    if (response.data) {
-      state.job = response.data
-    } else {
-      state.error = true
-    }
+    const { data } = await axios.get(`https://backend-jobs-main-d8y5e0.laravel.cloud/api/jobs/${jobId}`)
+    state.job = data || {}
+    if (!data) state.error = true
   } catch (error) {
     console.error('Error fetching job:', error)
     state.error = true
@@ -51,75 +44,116 @@ onMounted(async () => {
 })
 </script>
 
-
 <template>
-  <BackButton />
-  <section class="bg-green-50">
-    <div class="container m-auto py-10 px-6">
-      <!-- Gestion des erreurs -->
-      <div v-if="state.error" class="bg-red-100 p-6 rounded-lg shadow-md text-center">
-        <h2 class="text-2xl text-red-700 font-bold">Job not found</h2>
-        <p class="text-red-600 mt-2">😔 Sorry, we couldn't find the job with ID: {{ jobId }} </p>
-      </div>
+  <div class="min-h-screen bg-gray-50">
+    <BackButton />
+    
+    <!-- Loading State -->
+    <div v-if="state.isLoading" class="flex justify-center items-center py-20">
+      <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+    </div>
 
-      <!-- Affichage des détails de l'offre d'emploi -->
-      <div v-else class="grid grid-cols-1 md:grid-cols-70/30 w-full gap-6">
-        <main v-if="!state.isLoading">
-          <div class="bg-white p-6 rounded-lg shadow-md text-center md:text-left">
-            <div class="text-gray-500 mb-4">{{ state.job.type }}</div>
-            <h1 class="text-3xl font-bold mb-4">{{ state.job.title }}</h1>
-            <div class="text-gray-500 mb-4 flex align-middle justify-center md:justify-start">
-              <i class="pi pi-map-marker text-orange-700 my-1 mr-1"></i>
-              <p class="text-orange-700">{{ state.job.location }}</p>
+    <!-- Error State -->
+    <div v-else-if="state.error" class="max-w-4xl mx-auto px-4 py-10">
+      <div class="bg-red-50 border-l-4 border-red-500 p-6 rounded-lg shadow">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <svg class="h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+            </svg>
+          </div>
+          <div class="ml-4">
+            <h3 class="text-lg font-medium text-red-800">Offre introuvable</h3>
+            <div class="mt-2 text-sm text-red-700">
+              <p>Désolé, nous n'avons pas trouvé l'offre avec l'ID : {{ jobId }}</p>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
 
-          <div class="bg-white p-6 rounded-lg shadow-md mt-6">
-            <h3 class="text-green-800 text-lg font-bold mb-6">Job Description</h3>
-            <p class="mb-4">{{ state.job.description }}</p>
-
-            <h3 class="text-green-800 text-lg font-bold mb-2">Salary</h3>
-            <p class="mb-4">{{ state.job.salary }} /year</p>
+    <!-- Job Details -->
+    <div v-else class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div class="flex flex-col lg:flex-row gap-8">
+        <!-- Main Content -->
+        <main class="flex-1">
+          <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            <div class="p-6 md:p-8">
+              <span class="inline-block bg-green-100 text-green-800 text-xs px-3 py-1 rounded-full uppercase font-semibold tracking-wide mb-4">
+                {{ state.job.type }}
+              </span>
+              <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ state.job.title }}</h1>
+              <div class="flex items-center text-gray-600 mb-6">
+                <i class="pi pi-map-marker text-green-600 mr-2"></i>
+                <span class="text-green-700">{{ state.job.location }}</span>
+              </div>
+              
+              <div class="prose max-w-none">
+                <h3 class="text-xl font-semibold text-gray-900 mb-4">Description du poste</h3>
+                <p class="text-gray-700 mb-6">{{ state.job.description }}</p>
+                
+                <h3 class="text-xl font-semibold text-gray-900 mb-2">Salaire</h3>
+                <p class="text-green-600 font-medium">{{ state.job.salary }} / an</p>
+              </div>
+            </div>
           </div>
         </main>
 
         <!-- Sidebar -->
-        <aside v-if="!state.isLoading && state.job.company">
-          <div class="bg-white p-6 rounded-lg shadow-md">
-            <h3 class="text-xl font-bold mb-6">Company Info</h3>
-            <h2 class="text-2xl">{{ state.job.company.name }}</h2>
-            <p class="my-2">{{ state.job.company.description }}</p>
-
-            <hr class="my-4" />
-
-            <h3 class="text-xl">Contact Email:</h3>
-            <p class="my-2 bg-green-100 p-2 font-bold">
-              {{ state.job.company.contactEmail }}
-            </p>
-
-            <h3 class="text-xl">Contact Phone:</h3>
-            <p class="my-2 bg-green-100 p-2 font-bold">
-              {{ state.job.company.contactPhone }}
-            </p>
+        <aside class="w-full lg:w-80 space-y-6">
+          <!-- Company Info -->
+          <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            <div class="p-6">
+              <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
+                <i class="pi pi-building text-green-600 mr-2"></i>
+                Informations sur l'entreprise
+              </h3>
+              
+              <h4 class="text-lg font-semibold text-gray-800 mb-2">{{ state.job.company?.name }}</h4>
+              <p class="text-gray-600 mb-4">{{ state.job.company?.description }}</p>
+              
+              <div class="space-y-3">
+                <div>
+                  <h4 class="text-sm font-medium text-gray-500">Email de contact</h4>
+                  <p class="mt-1 text-gray-900 font-medium break-all bg-green-50 p-2 rounded-lg">
+                    {{ state.job.company?.contactEmail }}
+                  </p>
+                </div>
+                
+                <div>
+                  <h4 class="text-sm font-medium text-gray-500">Téléphone</h4>
+                  <p class="mt-1 text-gray-900 font-medium bg-green-50 p-2 rounded-lg">
+                    {{ state.job.company?.contactPhone }}
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <!-- Manage -->
-          <div class="bg-white p-6 rounded-lg shadow-md mt-6">
-            <h3 class="text-xl font-bold mb-6">Manage Job</h3>
-            <RouterLink
-              :to="'/jobs/edit/' + state.job.id"
-              class="bg-green-500 hover:bg-green-600 text-white text-center font-bold py-2 px-4 rounded-full w-full block"
-            >
-              Edit Job
-            </RouterLink>
-            <button @click="deleteJob(state.job.id)"
-              class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-full w-full mt-4"
-            >
-              Delete Job
-            </button>
+          <!-- Job Management -->
+          <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            <div class="p-6">
+              <h3 class="text-xl font-bold text-gray-900 mb-4">Gestion de l'offre</h3>
+              
+              <div class="space-y-3">
+                <RouterLink
+                  :to="'/jobs/edit/' + state.job.id"
+                  class="block w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg text-center transition-colors duration-200"
+                >
+                  Modifier l'offre
+                </RouterLink>
+                
+                <button 
+                  @click="deleteJob(state.job.id)"
+                  class="w-full bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200"
+                >
+                  Supprimer l'offre
+                </button>
+              </div>
+            </div>
           </div>
         </aside>
       </div>
     </div>
-  </section>
+  </div>
 </template>
