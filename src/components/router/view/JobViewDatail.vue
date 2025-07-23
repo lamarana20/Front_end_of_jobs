@@ -17,16 +17,16 @@ const state = reactive({
 })
 
 const deleteJob = async (jobId) => {
-  const confirmDelete = confirm('Êtes-vous sûr de vouloir supprimer cette offre ?')
+  const confirmDelete = confirm('Are you sure you want to delete this job?')
   if (!confirmDelete) return
   
   try {
     await axios.delete(`/api/api/jobs/${jobId}`)
-    toast.success('Offre supprimée avec succès !')
+    toast.success('Job deleted successfully!')
     router.push('/jobs')
   } catch (error) {
     console.error('Error deleting job:', error)
-    toast.error('Échec de la suppression. Veuillez réessayer.')
+    toast.error('Failed to delete. Please try again.')
   }
 }
 
@@ -63,9 +63,9 @@ onMounted(async () => {
             </svg>
           </div>
           <div class="ml-4">
-            <h3 class="text-lg font-medium text-red-800">Offre introuvable</h3>
+            <h3 class="text-lg font-medium text-red-800">Job not found</h3>
             <div class="mt-2 text-sm text-red-700">
-              <p>Désolé, nous n'avons pas trouvé l'offre avec l'ID : {{ jobId }}</p>
+              <p>Sorry, we couldn't find the job with ID: {{ jobId }}</p>
             </div>
           </div>
         </div>
@@ -89,11 +89,11 @@ onMounted(async () => {
               </div>
               
               <div class="prose max-w-none">
-                <h3 class="text-xl font-semibold text-gray-900 mb-4">Description du poste</h3>
+                <h3 class="text-xl font-semibold text-gray-900 mb-4">Job Description</h3>
                 <p class="text-gray-700 mb-6">{{ state.job.description }}</p>
                 
-                <h3 class="text-xl font-semibold text-gray-900 mb-2">Salaire</h3>
-                <p class="text-green-600 font-medium">{{ state.job.salary }} / an</p>
+                <h3 class="text-xl font-semibold text-gray-900 mb-2">Salary</h3>
+                <p class="text-green-600 font-medium">{{ state.job.salary }} / year</p>
               </div>
             </div>
           </div>
@@ -106,7 +106,7 @@ onMounted(async () => {
             <div class="p-6">
               <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
                 <i class="pi pi-building text-green-600 mr-2"></i>
-                Informations sur l'entreprise
+                Company Information
               </h3>
               
               <h4 class="text-lg font-semibold text-gray-800 mb-2">{{ state.job.company?.name }}</h4>
@@ -114,14 +114,14 @@ onMounted(async () => {
               
               <div class="space-y-3">
                 <div>
-                  <h4 class="text-sm font-medium text-gray-500">Email de contact</h4>
+                  <h4 class="text-sm font-medium text-gray-500">Contact Email</h4>
                   <p class="mt-1 text-gray-900 font-medium break-all bg-green-50 p-2 rounded-lg">
                     {{ state.job.company?.contactEmail }}
                   </p>
                 </div>
                 
                 <div>
-                  <h4 class="text-sm font-medium text-gray-500">Téléphone</h4>
+                  <h4 class="text-sm font-medium text-gray-500">Phone</h4>
                   <p class="mt-1 text-gray-900 font-medium bg-green-50 p-2 rounded-lg">
                     {{ state.job.company?.contactPhone }}
                   </p>
@@ -133,21 +133,21 @@ onMounted(async () => {
           <!-- Job Management -->
           <div class="bg-white rounded-xl shadow-md overflow-hidden">
             <div class="p-6">
-              <h3 class="text-xl font-bold text-gray-900 mb-4">Gestion de l'offre</h3>
+              <h3 class="text-xl font-bold text-gray-900 mb-4">Job Management</h3>
               
               <div class="space-y-3">
                 <RouterLink
                   :to="'/jobs/edit/' + state.job.id"
                   class="block w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg text-center transition-colors duration-200"
                 >
-                  Modifier l'offre
+                  Edit Job
                 </RouterLink>
                 
                 <button 
                   @click="deleteJob(state.job.id)"
                   class="w-full bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200"
                 >
-                  Supprimer l'offre
+                  Delete Job
                 </button>
               </div>
             </div>
